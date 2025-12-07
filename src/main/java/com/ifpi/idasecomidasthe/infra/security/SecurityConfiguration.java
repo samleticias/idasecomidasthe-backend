@@ -42,7 +42,8 @@ public class SecurityConfiguration {
                 .exceptionHandling(exception -> exception.accessDeniedHandler(new CustomAccessDeniedHandler()))
 
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(jwtVerificationFilter, SecurityFilter.class)
+                .addFilterAfter(jwtVerificationFilter, UsernamePasswordAuthenticationFilter.class)
+
                 .build();
     }
 
@@ -59,15 +60,31 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
+
         configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:3000",      // frontend local
-                "http://localhost:5000",      // flutter web local
-                "http://localhost:8080"
+                "http://localhost:58430",
+                "http://127.0.0.1:58430"
         ));
+
+        configuration.setAllowCredentials(true);
+//        configuration.setAllowedHeaders(Arrays.asList("*"));
+//        configuration.setExposedHeaders(Arrays.asList("*"));
+
+        configuration.setAllowedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "Accept"
+        ));
+
+        configuration.setExposedHeaders(Arrays.asList(
+                "Authorization"
+        ));
+
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 }
